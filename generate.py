@@ -14,7 +14,8 @@ def dfs(ind: int, sep: int, temp: list, single_team: set, single_team_unused: li
     # print(f'ind: {ind}')
     time, index = int(ind/(team_amount/2)), ind%(team_amount/2)
     tt = total_ans[sep][time]
-    # print(f"temp: {temp}")
+    # if ind==18:
+    #     print(f"temp: {temp}")
 
     # change level
     if index == 0:
@@ -69,7 +70,7 @@ def dfs(ind: int, sep: int, temp: list, single_team: set, single_team_unused: li
         for t2 in range(t1+1, team_amount+1):
             if team_used[t2]:
                 continue
-            if meet_table[t2][t2]:
+            if meet_table[t1][t2]:
                 continue
             team_used[t2] = 1
             meet_table[t1][t2] = 1
@@ -92,7 +93,6 @@ def dfs(ind: int, sep: int, temp: list, single_team: set, single_team_unused: li
                 level_table[t1].add(level)
                 level_table[t2].add(level)
                 temp[level] = ()
-                
             team_used[t2] = 0
             meet_table[t1][t2] = 0
             meet_table[t2][t1] = 0
@@ -105,7 +105,7 @@ def dfs(ind: int, sep: int, temp: list, single_team: set, single_team_unused: li
     return False
 
 level_amount = 5
-time_amount = 4
+time_amount = 3
 team_amount = 10
 seperation = 1
 meet_table = np.zeros((team_amount+1, team_amount+1), dtype=int)
@@ -115,33 +115,41 @@ total_ans = [[[(None, None) for x in range(level_amount)] for a in range(time_am
 if seperation*time_amount > team_amount-1:
     raise ValueError("Impossible Input Data")
 
-# pre-set 1
-for i in range(seperation):
-    for j in range(time_amount):
-        total_ans[i][j][j] = (1, None)
 
-# pre-set 2
-total_ans[0][0][0] = (1, 2)
-for i in range(seperation):
-    for j in range(time_amount):
-        if (i==j and j==0): continue
-        else:
-            if i==0:
-                index = j-1+2*(j%2)
+def pre_fill():
+    meet_table = np.zeros((team_amount+1, team_amount+1), dtype=int)
+    total_ans = [[[(None, None) for x in range(level_amount)] for a in range(time_amount)] for _ in range(seperation)]
+    # pre-set 1
+    for i in range(seperation):
+        for j in range(time_amount):
+            total_ans[i][j][j] = (1, None)
+
+    # pre-set 2
+    total_ans[0][0][0] = (1, 2)
+    for i in range(seperation):
+        for j in range(time_amount):
+            if (i==j and j==0): continue
             else:
-                index = (j+1)%level_amount
-            total_ans[i][j][index] = (2, None)
+                if i==0:
+                    index = j-1+2*(j%2)
+                else:
+                    index = (j+1)%level_amount
+                total_ans[i][j][index] = (2, None)
 
-# fix more
-meet_table[1][2] = 1
-meet_table[2][1] = 1
+    # fix more
+    meet_table[1][2] = 1
+    meet_table[2][1] = 1
+    return meet_table, total_ans
 
+
+# meet_table, total_ans = pre_fill()
 for sep in range(seperation):
     level_table = [set([i for i in range(0, level_amount)]) for _ in range(team_amount+1)]
     ans = []
     print("---"*10)
-    print('meet_table')
-    print(meet_table)
+    if sep:
+        print('meet_table')
+        print(meet_table)
     dfs(0, sep, [], [], [], np.zeros(level_amount, dtype=int), np.zeros(team_amount+1, dtype=int))
     print('total_ans')
     for e in total_ans[sep]:
