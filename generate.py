@@ -1,20 +1,17 @@
 import numpy as np
 import copy
+import args
 
+# some additional variables
 app = 0
 rmv = 0
-count = 0
 
-def dfs(ind: int, sep: int, temp: list, level_used: np.array, team_used: np.array, shift: int)->bool:
-    global count
+def dfs(ind: int, sep: int, temp: list, level_used: np.array, team_used: np.array)->bool:
     jump = 1
     threshold = 0 if sep==0 or ind<team_amount*time_amount/4 else 1
 
     # stop condition
     if ind == team_amount*time_amount/2:
-        if shift!=count:
-            count+=1
-            return False
         ans.append(temp)
         total_ans[sep] = copy.deepcopy(ans)
         return True
@@ -49,7 +46,6 @@ def dfs(ind: int, sep: int, temp: list, level_used: np.array, team_used: np.arra
             level_choice = level_table[t1].intersection(level_table[t2])
             if len(level_choice) == 0:
                 continue
-            # print(level_choice)
             for level in level_choice:
                 if level_used[level]:
                     continue
@@ -57,7 +53,7 @@ def dfs(ind: int, sep: int, temp: list, level_used: np.array, team_used: np.arra
                 level_table[t2].remove(level)
                 level_used[level] += 1
                 temp[level] = (t1, t2)
-                if dfs(ind+jump, sep, temp, level_used, team_used, shift):
+                if dfs(ind+jump, sep, temp, level_used, team_used):
                     return True
                 level_used[level] = 0
                 level_table[t1].add(level)
@@ -74,23 +70,29 @@ def dfs(ind: int, sep: int, temp: list, level_used: np.array, team_used: np.arra
             rmv+=1
     return False
 
-level_amount = 5
-time_amount = 4
-team_amount = 10
-seperation = 2
+# set arguments
+args = args.args
+level_amount = args.level if bool(args.level) else 5
+time_amount = args.time if bool(args.time) else 4
+team_amount = args.team if bool(args.team) else 10
+seperation = args.seperation if bool(args.seperation) else 1
 meet_table = np.zeros((team_amount+1, team_amount+1), dtype=int)
 
-total_ans = [[[(None, None) for x in range(level_amount)] for a in range(time_amount)] for _ in range(seperation)]
+print(f"Seperation:\t\t{seperation:2d}\nTeam Amount:\t{team_amount:2d}\nLevel per Sep:\t{level_amount:2d}\nTime per Sep:\t{time_amount:2d}")
 
+# basic check
 if seperation*time_amount > team_amount-1:
     raise ValueError("Impossible Input Data")
 
+# store answer
+total_ans = [[[(None, None) for x in range(level_amount)] for a in range(time_amount)] for _ in range(seperation)]
+# run dfs for each seperation
 for sep in range(seperation):
     level_table = [set([i for i in range(0, level_amount)]) for _ in range(team_amount+1)]
     ans = []
-    count = 0
-    dfs(0, sep, [], np.zeros(level_amount, dtype=int), np.zeros(team_amount+1, dtype=int), 3)
+    dfs(0, sep, [], np.zeros(level_amount, dtype=int), np.zeros(team_amount+1, dtype=int))
 
+# show result
 print("Time Table for Levels: ")
 for d in total_ans:
     for e in d:
@@ -104,6 +106,10 @@ for tm in range(1, team_amount+1):
         for time in range(0, time_amount):
             for level in range(0, level_amount):
                 if tm in total_ans[sep][time][level]:
-                    print(level, end="->")
+                    print(level+level_amount*sep+1, end="->")
                     break
     print("ED")
+
+print("--"*20)
+print("Meet Table: ")
+print(meet_table[1:,1:])
