@@ -11,7 +11,7 @@ if 'args' in dir():
     level_amount = args.level if bool(args.level) else 5
     time_amount = args.time if bool(args.time) else 4
     team_amount = args.team if bool(args.team) else 10
-    seperation = args.seperation if bool(args.seperation) else 1
+    seperation = args.seperation if bool(args.seperation) else 2
     show_level = args.show_level if bool(args.show_level) else True
     show_team = args.show_team if bool(args.show_team) else False
     show_meet = args.show_meet if bool(args.show_meet) else False
@@ -19,7 +19,7 @@ else:
     level_amount = 5
     time_amount = 4
     team_amount = 10
-    seperation = 1
+    seperation = 2
     show_level = True
     show_team = False
     show_meet = False
