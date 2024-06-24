@@ -63,8 +63,8 @@ def dfs(ind: int, sep: int, temp: list, level_used: np.array, team_used: np.arra
             if meet_table[t1][t2]>threshold:
                 continue
             team_used[t2] = 1
-            meet_table[t1][t2] += 1
-            meet_table[t2][t1] += 1
+            meet_table[t1][t2] += (sep+1)
+            meet_table[t2][t1] += (sep+1)
 
             level_choice = level_table[t1].intersection(level_table[t2])
             if len(level_choice) == 0:
@@ -83,8 +83,8 @@ def dfs(ind: int, sep: int, temp: list, level_used: np.array, team_used: np.arra
                 level_table[t2].add(level)
                 temp[level] = ()
             team_used[t2] = 0
-            meet_table[t1][t2] -= 1
-            meet_table[t2][t1] -= 1
+            meet_table[t1][t2] -= (sep+1)
+            meet_table[t2][t1] -= (sep+1)
         team_used[t1] = 0
     if index==0 and time!=0:
         if last_temp in ans:
