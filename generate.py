@@ -8,13 +8,14 @@ except:
 # set arguments
 if 'args' in dir():
     args = args.args
-    level_amount = args.level if bool(args.level) else 5
-    time_amount = args.time if bool(args.time) else 4
-    team_amount = args.team if bool(args.team) else 10
-    seperation = args.seperation if bool(args.seperation) else 2
-    show_level = args.show_level if bool(args.show_level) else True
-    show_team = args.show_team if bool(args.show_team) else False
-    show_meet = args.show_meet if bool(args.show_meet) else False
+    print(args)
+    level_amount = args.level
+    time_amount = args.time
+    team_amount = args.team
+    seperation = args.seperation
+    show_level = args.show_level
+    show_team = args.show_team
+    show_meet = args.show_meet
 else:
     level_amount = 5
     time_amount = 4
@@ -30,16 +31,17 @@ rmv = 0
 
 # finding function
 def dfs(ind: int, sep: int, temp: list, level_used: np.array, team_used: np.array)->bool:
-    jump = 1
-    threshold = 0 if sep==0 or ind<team_amount*time_amount/4 else 1
-
     # stop condition
-    if ind == team_amount*time_amount/2:
+    # print(ind)
+    if ind == team_amount*(time_amount/2):
+        print('arrive')
         ans.append(temp)
         total_ans[sep] = copy.deepcopy(ans)
         return True
     
-    time, index = int(ind/(team_amount/2)), ind%(team_amount/2)
+    time, index = ind//(team_amount/2), ind%(team_amount/2)
+    threshold = 0 if sep==0 or ind<team_amount*time_amount/4 else 1
+    jump = 1
 
     # change level
     if index == 0:
@@ -62,13 +64,13 @@ def dfs(ind: int, sep: int, temp: list, level_used: np.array, team_used: np.arra
                 continue
             if meet_table[t1][t2]>threshold:
                 continue
-            team_used[t2] = 1
-            meet_table[t1][t2] += (sep+1)
-            meet_table[t2][t1] += (sep+1)
 
             level_choice = level_table[t1].intersection(level_table[t2])
             if len(level_choice) == 0:
                 continue
+            team_used[t2] = 1
+            meet_table[t1][t2] += jump
+            meet_table[t2][t1] += jump
             for level in level_choice:
                 if level_used[level]:
                     continue
@@ -76,15 +78,15 @@ def dfs(ind: int, sep: int, temp: list, level_used: np.array, team_used: np.arra
                 level_table[t2].remove(level)
                 level_used[level] += 1
                 temp[level] = (t1, t2)
-                if dfs(ind+jump, sep, temp, level_used, team_used):
+                if dfs(ind+1, sep, temp, level_used, team_used):
                     return True
                 level_used[level] = 0
                 level_table[t1].add(level)
                 level_table[t2].add(level)
                 temp[level] = ()
             team_used[t2] = 0
-            meet_table[t1][t2] -= (sep+1)
-            meet_table[t2][t1] -= (sep+1)
+            meet_table[t1][t2] -= jump
+            meet_table[t2][t1] -= jump
         team_used[t1] = 0
     if index==0 and time!=0:
         if last_temp in ans:
