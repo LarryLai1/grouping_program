@@ -40,7 +40,8 @@ def dfs(ind: int, sep: int, temp: list, level_used: np.array, team_used: np.arra
         return True
     
     time, index = ind//(team_amount/2), ind%(team_amount/2)
-    threshold = 0 if sep==0 or ind<team_amount*time_amount/4 else 1
+    threshold = 0 if sep==0 or ind<team_amount*time_amount/3 else 1
+    # threshold = 0
     jump = 1
 
     # change level
